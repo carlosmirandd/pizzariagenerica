@@ -1,0 +1,1156 @@
+<!DOCTYPE html>
+<html lang="pt-BR">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Pizzaria LeVitlon</title>
+    
+    <!-- Tailwind CSS -->
+    <script src="https://cdn.tailwindcss.com"></script>
+    
+    <!-- Google Fonts: Poppins e Lobster -->
+    <link rel="preconnect" href="https://fonts.googleapis.com">
+    <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+    <link href="https://fonts.googleapis.com/css2?family=Lobster&family=Poppins:wght@300;400;500;600;700&display=swap" rel="stylesheet">
+    
+    <style>
+        /* ===== FUNDO PERSONALIZÁVEL ===== */
+        /* <!-- COLOQUE A URL DA SUA IMAGEM DE FUNDO AQUI --> */
+        body {
+            background-image: url('https://i.imgur.com/dfXWncN.png');
+            background-size: cover;
+            background-attachment: fixed;
+            background-position: center;
+        }
+        /* =================================== */
+
+        body { font-family: 'Poppins', sans-serif; }
+        .font-lobster { font-family: 'Lobster', cursive; }
+        .page { display: none; }
+        .page.active { display: block; }
+        .loader { border: 5px solid #f3f3f3; border-top: 5px solid #ef4444; border-radius: 50%; width: 50px; height: 50px; animation: spin 1s linear infinite; }
+        @keyframes spin { 0% { transform: rotate(0deg); } 100% { transform: rotate(360deg); } }
+        /* Estilos para o modal */
+        .modal { transition: opacity 0.25s ease; }
+        .modal-active { display: flex; }
+        /* Classe para o fundo do cardápio */
+        .menu-background {
+            background-color: #ffffff;
+            border-radius: 0.5rem;
+            box-shadow: 0 4px 6px -1px rgb(0 0 0 / 0.1), 0 2px 4px -2px rgb(0 0 0 / 0.1);
+        }
+    </style>
+</head>
+<body class="bg-gray-50">
+
+    <!-- Overlay de Carregamento -->
+    <div id="loading-overlay" class="fixed inset-0 bg-black bg-opacity-50 z-50 flex items-center justify-center hidden">
+        <div class="loader"></div>
+    </div>
+
+    <!-- ===== PÁGINA PRINCIPAL (CARDÁPIO) ===== -->
+    <div id="main-page" class="page active">
+        <header class="bg-white shadow-md sticky top-0 z-40">
+            <nav class="container mx-auto px-6 py-3 flex justify-between items-center">
+                <h1 class="text-3xl text-red-600 font-lobster">🍕 Pizzaria LeVitlon</h1>
+                <div class="flex items-center">
+                    <div id="user-menu" class="hidden items-center">
+                        <a href="#" id="admin-panel-link" class="text-gray-700 hover:text-red-600 px-3 py-2 rounded-md text-sm font-medium hidden">Painel do Admin</a>
+                        <a href="#" id="my-orders-link" class="text-gray-700 hover:text-red-600 px-3 py-2 rounded-md text-sm font-medium">Meus Pedidos</a>
+                        <a href="#" id="logout-button" class="text-gray-700 hover:text-red-600 px-3 py-2 rounded-md text-sm font-medium">Sair</a>
+                    </div>
+                    <div id="guest-menu">
+                         <a href="#" id="login-link" class="text-gray-700 hover:text-red-600 px-3 py-2 rounded-md text-sm font-medium">Login / Cadastrar</a>
+                    </div>
+                    <!-- Links de Redes Sociais -->
+                    <a href="https://instagram.com/ifrjniteroi" target="_blank" class="text-gray-600 hover:text-red-600 ml-4">
+                        <svg class="h-6 w-6" fill="none" stroke="currentColor" viewBox="0 0 24 24" xmlns="http://www.w3.org/2000/svg"><rect x="2" y="2" width="20" height="20" rx="5" ry="5"></rect><path d="M16 11.37A4 4 0 1 1 12.63 8 4 4 0 0 1 16 11.37z"></path><line x1="17.5" y1="6.5" x2="17.51" y2="6.5"></line></svg>
+                    </a>
+                    <a href="https://wa.me/5521978950297" target="_blank" class="text-gray-600 hover:text-red-600 ml-3">
+                       <svg class="h-6 w-6" fill="currentColor" viewBox="0 0 24 24" xmlns="http://www.w3.org/2000/svg"><path d="M12.04 2C6.58 2 2.13 6.45 2.13 11.91C2.13 13.66 2.59 15.36 3.45 16.86L2.05 22L7.31 20.62C8.75 21.41 10.36 21.82 12.04 21.82C17.5 21.82 21.95 17.37 21.95 11.91C21.95 9.27 20.92 6.78 19.05 4.91C17.18 3.03 14.69 2 12.04 2ZM12.04 20.13C10.56 20.13 9.11 19.72 7.85 18.96L7.5 18.73L4.47 19.53L5.28 16.58L5.04 16.22C4.2 14.87 3.79 13.38 3.79 11.91C3.79 7.39 7.51 3.67 12.04 3.67C14.28 3.67 16.35 4.54 17.89 6.08C19.43 7.62 20.29 9.69 20.29 11.91C20.29 16.43 16.57 20.13 12.04 20.13ZM17.36 14.26C17.11 14.13 15.97 13.57 15.75 13.49C15.53 13.41 15.38 13.38 15.22 13.63C15.07 13.88 14.51 14.51 14.33 14.69C14.16 14.86 13.98 14.88 13.73 14.75C13.48 14.63 12.67 14.35 11.73 13.5C10.96 12.81 10.45 12.02 10.3 11.77C10.15 11.52 10.28 11.39 10.41 11.26C10.52 11.15 10.65 10.97 10.78 10.82C10.91 10.67 10.96 10.54 11.06 10.34C11.16 10.14 11.11 9.96 11.03 9.81C10.96 9.66 10.45 8.41 10.22 7.85C10 7.31 9.78 7.36 9.61 7.35H9.08C8.91 7.35 8.66 7.43 8.46 7.63C8.26 7.83 7.63 8.41 7.63 9.66C7.63 10.91 8.49 12.11 8.61 12.26C8.74 12.41 10.46 15.01 13.01 16.03C13.59 16.28 14.04 16.43 14.38 16.53C14.89 16.68 15.34 16.65 15.7 16.58C16.1 16.5 16.96 15.95 17.18 15.34C17.41 14.73 17.41 14.38 17.36 14.26Z"></path></svg>
+                    </a>
+                    <button id="cart-button" class="relative ml-4">
+                        <svg class="h-6 w-6 text-gray-700" fill="none" viewBox="0 0 24 24" stroke="currentColor"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M3 3h2l.4 2M7 13h10l4-8H5.4M7 13L5.4 5M7 13l-2.293 2.293c-.63.63-.184 1.707.707 1.707H17m0 0a2 2 0 100 4 2 2 0 000-4zm-8 2a2 2 0 11-4 0 2 2 0 014 0z" /></svg>
+                        <span id="cart-count" class="absolute -top-2 -right-2 bg-red-600 text-white text-xs rounded-full h-5 w-5 flex items-center justify-center">0</span>
+                    </button>
+                </div>
+            </nav>
+        </header>
+        <main class="container mx-auto p-6 lg:p-8 my-8">
+            <div id="store-status-banner" class="hidden p-4 mb-6 text-center text-white bg-red-500 rounded-lg shadow-lg">
+                <p class="font-bold">Estamos fechados no momento!</p>
+                <p id="next-opening-time" class="text-sm"></p>
+            </div>
+            <div class="menu-background p-6" id="menu-container">
+                <div class="text-center py-16">
+                    <div class="loader"></div>
+                    <p class="mt-4 text-gray-600">Carregando cardápio...</p>
+                </div>
+            </div>
+        </main>
+    </div>
+
+    <!-- ===== PÁGINA DE AUTENTICAÇÃO ===== -->
+    <div id="auth-page" class="page">
+        <div class="min-h-screen flex items-center justify-center py-12 px-4 sm:px-6 lg:px-8">
+            <div class="max-w-md w-full space-y-8 bg-white/95 backdrop-blur-sm p-10 rounded-xl shadow-lg">
+                <div>
+                    <h1 class="text-center text-5xl text-red-600 font-lobster">
+                        🍕 Pizzaria LeVitlon
+                    </h1>
+                    <h2 class="mt-6 text-center text-2xl font-bold text-gray-900">
+                        Faça seu login
+                    </h2>
+                </div>
+                <form id="login-form" class="mt-8 space-y-6">
+                    <div class="rounded-md shadow-sm -space-y-px">
+                        <div>
+                            <input id="login-email" type="email" required class="appearance-none rounded-none relative block w-full px-3 py-2 border border-gray-300 placeholder-gray-500 text-gray-900 rounded-t-md focus:outline-none focus:ring-red-500 focus:border-red-500 focus:z-10 sm:text-sm" placeholder="Email">
+                        </div>
+                        <div>
+                            <input id="login-password" type="password" required class="appearance-none rounded-none relative block w-full px-3 py-2 border border-gray-300 placeholder-gray-500 text-gray-900 rounded-b-md focus:outline-none focus:ring-red-500 focus:border-red-500 focus:z-10 sm:text-sm" placeholder="Senha">
+                        </div>
+                    </div>
+                     <div class="text-sm text-right">
+                        <a href="#" id="forgot-password-link" class="font-medium text-red-600 hover:text-red-500">
+                            Esqueceu a senha?
+                        </a>
+                    </div>
+                    <div>
+                        <button type="submit" class="group relative w-full flex justify-center py-2 px-4 border border-transparent text-sm font-medium rounded-md text-white bg-red-600 hover:bg-red-700 focus:outline-none focus:ring-2 focus:ring-offset-2 focus:ring-red-500">
+                            Entrar
+                        </button>
+                    </div>
+                </form>
+                <p class="mt-2 text-center text-sm text-gray-600">
+                    Não tem uma conta?
+                    <a href="#" id="show-register" class="font-medium text-red-600 hover:text-red-500">
+                        Cadastre-se
+                    </a>
+                </p>
+                <div id="login-error" class="text-red-500 text-center text-sm mt-2"></div>
+            </div>
+        </div>
+    </div>
+    
+    <!-- ===== PÁGINA DE CADASTRO ===== -->
+    <div id="register-page" class="page">
+        <div class="min-h-screen flex items-center justify-center py-12 px-4 sm:px-6 lg:px-8">
+            <div class="max-w-md w-full space-y-8 bg-white/95 backdrop-blur-sm p-10 rounded-xl shadow-lg">
+                <div>
+                    <h2 class="mt-6 text-center text-2xl font-bold text-gray-900">
+                        Crie sua conta
+                    </h2>
+                </div>
+                <form id="register-form" class="mt-8 space-y-6">
+                    <div class="rounded-md shadow-sm -space-y-px">
+                         <div>
+                            <input id="register-name" type="text" required class="appearance-none rounded-none relative block w-full px-3 py-2 border border-gray-300 placeholder-gray-500 text-gray-900 rounded-t-md focus:outline-none focus:ring-red-500 focus:border-red-500 focus:z-10 sm:text-sm" placeholder="Seu Nome">
+                        </div>
+                        <div>
+                            <input id="register-email" type="email" required class="appearance-none rounded-none relative block w-full px-3 py-2 border border-gray-300 placeholder-gray-500 text-gray-900 focus:outline-none focus:ring-red-500 focus:border-red-500 focus:z-10 sm:text-sm" placeholder="Email">
+                        </div>
+                        <div>
+                            <input id="register-password" type="password" required class="appearance-none rounded-none relative block w-full px-3 py-2 border border-gray-300 placeholder-gray-500 text-gray-900 rounded-b-md focus:outline-none focus:ring-red-500 focus:border-red-500 focus:z-10 sm:text-sm" placeholder="Senha (mínimo 6 caracteres)">
+                        </div>
+                    </div>
+                    <div>
+                        <button type="submit" class="group relative w-full flex justify-center py-2 px-4 border border-transparent text-sm font-medium rounded-md text-white bg-red-600 hover:bg-red-700 focus:outline-none focus:ring-2 focus:ring-offset-2 focus:ring-red-500">
+                            Cadastrar
+                        </button>
+                    </div>
+                </form>
+                <p class="mt-2 text-center text-sm text-gray-600">
+                    Já tem uma conta?
+                    <a href="#" id="show-login" class="font-medium text-red-600 hover:text-red-500">
+                        Faça login
+                    </a>
+                </p>
+                 <div id="register-error" class="text-red-500 text-center text-sm mt-2"></div>
+            </div>
+        </div>
+    </div>
+    
+    <!-- ===== PÁGINA DE REDEFINIÇÃO DE SENHA ===== -->
+    <div id="reset-password-page" class="page">
+        <div class="min-h-screen flex items-center justify-center py-12 px-4 sm:px-6 lg:px-8">
+            <div class="max-w-md w-full space-y-8 bg-white/95 backdrop-blur-sm p-10 rounded-xl shadow-lg">
+                <div>
+                    <h2 class="mt-6 text-center text-2xl font-bold text-gray-900">
+                        Redefinir Senha
+                    </h2>
+                    <p class="mt-2 text-center text-sm text-gray-600">
+                        Digite seu e-mail e enviaremos um link para você criar uma nova senha.
+                    </p>
+                </div>
+                <form id="reset-password-form" class="mt-8 space-y-6">
+                    <div class="rounded-md shadow-sm">
+                        <input id="reset-email" type="email" required class="appearance-none rounded-md relative block w-full px-3 py-2 border border-gray-300 placeholder-gray-500 text-gray-900 focus:outline-none focus:ring-red-500 focus:border-red-500 sm:text-sm" placeholder="Seu e-mail de cadastro">
+                    </div>
+                    <div>
+                        <button type="submit" class="group relative w-full flex justify-center py-2 px-4 border border-transparent text-sm font-medium rounded-md text-white bg-red-600 hover:bg-red-700 focus:outline-none focus:ring-2 focus:ring-offset-2 focus:ring-red-500">
+                            Enviar E-mail de Redefinição
+                        </button>
+                    </div>
+                </form>
+                <div id="reset-feedback" class="text-center text-sm mt-2"></div>
+                <p class="mt-2 text-center text-sm text-gray-600">
+                    Lembrou a senha?
+                    <a href="#" id="back-to-login-link" class="font-medium text-red-600 hover:text-red-500">
+                        Voltar para o Login
+                    </a>
+                </p>
+            </div>
+        </div>
+    </div>
+
+    <!-- ===== PÁGINA DO CARRINHO/PAGAMENTO ===== -->
+    <div id="cart-page" class="page">
+        <div class="container mx-auto p-6">
+            <div class="bg-white p-8 rounded-lg shadow-lg max-w-2xl mx-auto">
+                <div class="flex justify-between items-center mb-6">
+                    <h2 class="text-3xl font-bold text-gray-800">Seu Pedido</h2>
+                    <button id="back-to-menu-from-cart" class="text-red-600 hover:text-red-800 font-medium">Voltar ao Cardápio</button>
+                </div>
+                
+                <div id="cart-items-list">
+                    <!-- Itens do carrinho serão inseridos aqui -->
+                </div>
+
+                <div class="border-t mt-6 pt-6">
+                    <div class="flex justify-between items-center text-xl font-bold">
+                        <span>Total</span>
+                        <span id="cart-total">R$ 0,00</span>
+                    </div>
+                </div>
+
+                <div class="mt-8">
+                    <h3 class="text-2xl font-bold text-gray-800 mb-4">Informações de Entrega e Pagamento</h3>
+                    <div class="space-y-4">
+                        <div>
+                            <label for="recipient-name" class="block text-sm font-medium text-gray-700">Nome de quem vai receber <span class="text-red-500">*</span></label>
+                            <input type="text" id="recipient-name" required class="mt-1 block w-full shadow-sm sm:text-sm border-gray-300 rounded-md">
+                        </div>
+                        <div>
+                            <label for="contact-number" class="block text-sm font-medium text-gray-700">Número de Contato (WhatsApp) <span class="text-red-500">*</span></label>
+                            <input type="tel" id="contact-number" required class="mt-1 block w-full shadow-sm sm:text-sm border-gray-300 rounded-md" placeholder="(XX) XXXXX-XXXX">
+                        </div>
+                        <div>
+                            <label for="delivery-address" class="block text-sm font-medium text-gray-700">Endereço para entrega (Rua, Número) <span class="text-red-500">*</span></label>
+                            <input type="text" id="delivery-address" required class="mt-1 block w-full shadow-sm sm:text-sm border-gray-300 rounded-md">
+                        </div>
+                        <div>
+                            <label for="delivery-neighborhood" class="block text-sm font-medium text-gray-700">Bairro <span class="text-red-500">*</span></label>
+                            <input type="text" id="delivery-neighborhood" required class="mt-1 block w-full shadow-sm sm:text-sm border-gray-300 rounded-md">
+                        </div>
+                        <div>
+                            <label for="delivery-cep" class="block text-sm font-medium text-gray-700">CEP <span class="text-red-500">*</span></label>
+                            <input type="text" id="delivery-cep" required class="mt-1 block w-full shadow-sm sm:text-sm border-gray-300 rounded-md" placeholder="XXXXX-XXX">
+                        </div>
+                        <div>
+                            <label for="delivery-reference" class="block text-sm font-medium text-gray-700">Ponto de referência (Opcional)</label>
+                            <input type="text" id="delivery-reference" class="mt-1 block w-full shadow-sm sm:text-sm border-gray-300 rounded-md">
+                        </div>
+                        <div>
+                            <label for="order-observation" class="block text-sm font-medium text-gray-700">Observações (Opcional)</label>
+                            <textarea id="order-observation" rows="3" class="mt-1 block w-full shadow-sm sm:text-sm border-gray-300 rounded-md" placeholder="Ex: Pizza sem cebola, etc."></textarea>
+                        </div>
+                        <div>
+                            <label for="payment-method" class="block text-sm font-medium text-gray-700">Forma de Pagamento</label>
+                            <select id="payment-method" class="mt-1 block w-full pl-3 pr-10 py-2 text-base border-gray-300 focus:outline-none focus:ring-red-500 focus:border-red-500 sm:text-sm rounded-md">
+                                <option>Cartão de Crédito na Entrega</option>
+                                <option>Cartão de Débito na Entrega</option>
+                                <option>PIX na Entrega</option>
+                                <option>Dinheiro</option>
+                            </select>
+                        </div>
+                         <div id="change-for-money" class="hidden">
+                            <label for="money-change" class="block text-sm font-medium text-gray-700">Precisa de troco para quanto?</label>
+                            <input type="text" id="money-change" class="mt-1 block w-full shadow-sm sm:text-sm border-gray-300 rounded-md" placeholder="Ex: 50,00">
+                        </div>
+                    </div>
+                </div>
+
+                <div class="mt-8">
+                    <button id="place-order-button" class="w-full bg-green-600 hover:bg-green-700 text-white font-bold py-3 px-4 rounded-lg text-xl">
+                        Finalizar Pedido
+                    </button>
+                </div>
+            </div>
+        </div>
+    </div>
+    
+    <!-- ===== PÁGINA DE ACOMPANHAMENTO DE PEDIDOS (CLIENTE) ===== -->
+    <div id="orders-page" class="page">
+        <div class="container mx-auto p-6">
+            <div class="bg-white p-8 rounded-lg shadow-lg max-w-4xl mx-auto">
+                <div class="flex justify-between items-center mb-6">
+                    <h2 class="text-3xl font-bold text-gray-800">Meus Pedidos</h2>
+                    <button id="back-to-menu-from-orders" class="text-red-600 hover:text-red-800 font-medium">Voltar ao Cardápio</button>
+                </div>
+                <div id="user-orders-list" class="space-y-6">
+                    <!-- Lista de pedidos do usuário será inserida aqui -->
+                </div>
+            </div>
+        </div>
+    </div>
+
+    <!-- ===== PÁGINA DO ADMINISTRADOR ===== -->
+    <div id="admin-page" class="page">
+        <div class="container mx-auto p-6">
+            <div class="bg-white p-4 sm:p-8 rounded-lg shadow-lg">
+                <div class="flex flex-col sm:flex-row justify-between sm:items-center mb-6">
+                    <h2 class="text-2xl sm:text-3xl font-bold text-gray-800 mb-4 sm:mb-0">Painel do Administrador</h2>
+                     <button id="back-to-menu-from-admin" class="text-red-600 hover:text-red-800 font-medium self-start sm:self-center">Voltar ao Cardápio</button>
+                </div>
+                <!-- Abas de Navegação do Admin -->
+                <div class="border-b border-gray-200">
+                    <nav class="-mb-px flex space-x-4 sm:space-x-8" aria-label="Tabs">
+                        <button id="tab-orders" class="whitespace-nowrap py-4 px-1 border-b-2 font-medium text-sm border-red-500 text-red-600">Pedidos Recebidos</button>
+                        <button id="tab-products" class="whitespace-nowrap py-4 px-1 border-b-2 font-medium text-sm border-transparent text-gray-500 hover:text-gray-700 hover:border-gray-300">Gerenciar Produtos</button>
+                        <button id="tab-hours" class="whitespace-nowrap py-4 px-1 border-b-2 font-medium text-sm border-transparent text-gray-500 hover:text-gray-700 hover:border-gray-300">Horário de Funcionamento</button>
+                    </nav>
+                </div>
+                <!-- Conteúdo das Abas -->
+                <div id="admin-orders-content" class="py-6">
+                    <div id="admin-orders-list" class="space-y-6"></div>
+                </div>
+                <div id="admin-products-content" class="hidden py-6">
+                    <div class="flex justify-end mb-4">
+                        <button id="add-product-btn" class="bg-green-600 hover:bg-green-700 text-white font-bold py-2 px-4 rounded-lg">Adicionar Novo Produto</button>
+                    </div>
+                    <div id="admin-products-list" class="space-y-4"></div>
+                </div>
+                <div id="admin-hours-content" class="hidden py-6">
+                    <h3 class="text-xl font-bold text-gray-800 mb-4">Definir Horário de Funcionamento</h3>
+                    <div id="hours-form" class="space-y-4">
+                        <!-- Horários serão gerados aqui pelo JS -->
+                    </div>
+                    <div class="mt-6 flex justify-end">
+                        <button id="save-hours-btn" class="bg-blue-600 hover:bg-blue-700 text-white font-bold py-2 px-4 rounded-lg">Salvar Horários</button>
+                    </div>
+                    <div id="hours-feedback" class="mt-2 text-sm text-green-600"></div>
+                </div>
+            </div>
+        </div>
+    </div>
+
+    <!-- ===== MODAL PARA ADICIONAR/EDITAR PRODUTO ===== -->
+    <div id="product-modal" class="modal fixed inset-0 bg-black bg-opacity-50 z-50 hidden items-center justify-center p-4">
+        <div class="bg-white rounded-lg shadow-xl p-6 w-full max-w-lg max-h-full overflow-y-auto">
+            <h3 id="modal-title" class="text-2xl font-bold mb-4">Adicionar Produto</h3>
+            <form id="product-form">
+                <input type="hidden" id="product-id">
+                <div class="space-y-4">
+                    <div>
+                        <label for="product-name" class="block text-sm font-medium text-gray-700">Nome do Produto</label>
+                        <input type="text" id="product-name" required class="mt-1 block w-full shadow-sm sm:text-sm border-gray-300 rounded-md">
+                    </div>
+                    <div>
+                        <label for="product-description" class="block text-sm font-medium text-gray-700">Descrição</label>
+                        <textarea id="product-description" rows="3" class="mt-1 block w-full shadow-sm sm:text-sm border-gray-300 rounded-md"></textarea>
+                    </div>
+                    <div>
+                        <label for="product-category" class="block text-sm font-medium text-gray-700">Categoria</label>
+                        <select id="product-category" required class="mt-1 block w-full py-2 px-3 border border-gray-300 bg-white rounded-md shadow-sm focus:outline-none focus:ring-red-500 focus:border-red-500 sm:text-sm">
+                            <option value="salgadas">Pizza Salgada</option>
+                            <option value="doces">Pizza Doce</option>
+                            <option value="bebidas">Bebida</option>
+                            <option value="combos">Combo</option>
+                        </select>
+                    </div>
+                     <div>
+                        <label for="product-image-url" class="block text-sm font-medium text-gray-700">URL da Imagem do Produto</label>
+                        <input type="url" id="product-image-url" required class="mt-1 block w-full shadow-sm sm:text-sm border-gray-300 rounded-md" placeholder="https://exemplo.com/imagem.png">
+                    </div>
+                    <div>
+                        <label class="block text-sm font-medium text-gray-700">Tamanhos e Preços</label>
+                        <div id="sizes-container" class="space-y-2 mt-1"></div>
+                        <button type="button" id="add-size-btn" class="mt-2 text-sm text-blue-600 hover:text-blue-800">+ Adicionar tamanho</button>
+                    </div>
+                </div>
+                <div class="mt-6 flex justify-end space-x-3">
+                    <button type="button" id="cancel-product-form" class="bg-gray-200 text-gray-800 font-bold py-2 px-4 rounded-lg hover:bg-gray-300">Cancelar</button>
+                    <button type="submit" class="bg-red-600 text-white font-bold py-2 px-4 rounded-lg hover:bg-red-700">Salvar Produto</button>
+                </div>
+            </form>
+        </div>
+    </div>
+
+    <!-- Firebase SDKs -->
+    <script type="module">
+        // Importações do Firebase (sem o Storage)
+        import { initializeApp } from "https://www.gstatic.com/firebasejs/11.6.1/firebase-app.js";
+        import { getAuth, createUserWithEmailAndPassword, signInWithEmailAndPassword, signOut, onAuthStateChanged, sendPasswordResetEmail } from "https://www.gstatic.com/firebasejs/11.6.1/firebase-auth.js";
+        import { getFirestore, collection, addDoc, query, where, onSnapshot, doc, updateDoc, deleteDoc, serverTimestamp, getDoc, setDoc } from "https://www.gstatic.com/firebasejs/11.6.1/firebase-firestore.js";
+
+        // Cole sua configuração do Firebase aqui
+        const firebaseConfig = {
+              apiKey: "AIzaSyDkkttXj--SF0dvwSuY-D63V03h4qvkWqE",
+              authDomain: "levitlon.firebaseapp.com",
+              projectId: "levitlon",
+              storageBucket: "levitlon.firebasestorage.app",
+              messagingSenderId: "860077752001",
+              appId: "1:860077752001:web:a40472ddd150b244aa1e40",
+              measurementId: "G-6DYFDEGJKV"
+        };
+        
+        const app = initializeApp(firebaseConfig);
+        const auth = getAuth(app);
+        const db = getFirestore(app);
+
+        // ===== VARIÁVEIS GLOBAIS E ESTADO =====
+        let cart = [];
+        const adminEmail = "admin@levitlon.com";
+        let currentUser = null;
+        let allProducts = [];
+        let openingHours = {};
+        const daysOfWeek = ["domingo", "segunda", "terca", "quarta", "quinta", "sexta", "sabado"];
+
+        // ===== ELEMENTOS DO DOM =====
+        const pages = document.querySelectorAll('.page');
+        const loadingOverlay = document.getElementById('loading-overlay');
+        const productModal = document.getElementById('product-modal');
+        const productForm = document.getElementById('product-form');
+        const sizesContainer = document.getElementById('sizes-container');
+        const userMenu = document.getElementById('user-menu');
+        const guestMenu = document.getElementById('guest-menu');
+        const adminPanelLink = document.getElementById('admin-panel-link');
+
+        // ===== FUNÇÕES DE UI E NAVEGAÇÃO =====
+        function showPage(pageId) {
+            pages.forEach(page => {
+                page.classList.toggle('active', page.id === pageId);
+            });
+        }
+
+        function toggleLoading(show) {
+            loadingOverlay.classList.toggle('hidden', !show);
+        }
+
+        function updateNavUI(user) {
+            if (user) {
+                userMenu.classList.remove('hidden');
+                guestMenu.classList.add('hidden');
+                adminPanelLink.classList.toggle('hidden', user.email !== adminEmail);
+            } else {
+                userMenu.classList.add('hidden');
+                guestMenu.classList.remove('hidden');
+                adminPanelLink.classList.add('hidden');
+            }
+        }
+        
+        // ===== LÓGICA DE AUTENTICAÇÃO E REDEFINIÇÃO DE SENHA =====
+        onAuthStateChanged(auth, (user) => {
+            currentUser = user;
+            updateNavUI(user);
+            if (user) {
+                document.getElementById('recipient-name').value = user.displayName || '';
+                document.getElementById('contact-number').value = user.phoneNumber || '';
+            } else {
+                cart = [];
+                updateCartUI();
+            }
+        });
+
+        document.getElementById('login-form').addEventListener('submit', async (e) => {
+            e.preventDefault();
+            toggleLoading(true);
+            const email = document.getElementById('login-email').value;
+            const password = document.getElementById('login-password').value;
+            const errorDiv = document.getElementById('login-error');
+            try {
+                await signInWithEmailAndPassword(auth, email, password);
+                errorDiv.textContent = '';
+                showPage('main-page');
+            } catch (error) {
+                errorDiv.textContent = 'Email ou senha inválidos.';
+                console.error("Erro de login:", error);
+            } finally {
+                toggleLoading(false);
+            }
+        });
+
+        document.getElementById('register-form').addEventListener('submit', async (e) => {
+            e.preventDefault();
+            toggleLoading(true);
+            const email = document.getElementById('register-email').value;
+            const password = document.getElementById('register-password').value;
+            const errorDiv = document.getElementById('register-error');
+            if (password.length < 6) {
+                errorDiv.textContent = 'A senha deve ter no mínimo 6 caracteres.';
+                toggleLoading(false);
+                return;
+            }
+            try {
+                await createUserWithEmailAndPassword(auth, email, password);
+                errorDiv.textContent = '';
+                showPage('main-page');
+            } catch (error) {
+                errorDiv.textContent = 'Não foi possível criar a conta. Verifique o email.';
+                console.error("Erro de cadastro:", error);
+            } finally {
+                toggleLoading(false);
+            }
+        });
+
+        document.getElementById('logout-button').addEventListener('click', () => {
+            signOut(auth);
+            showPage('main-page');
+        });
+
+        document.getElementById('forgot-password-link').addEventListener('click', (e) => {
+            e.preventDefault();
+            showPage('reset-password-page');
+        });
+
+        document.getElementById('back-to-login-link').addEventListener('click', (e) => {
+            e.preventDefault();
+            showPage('auth-page');
+        });
+
+        document.getElementById('reset-password-form').addEventListener('submit', async (e) => {
+            e.preventDefault();
+            const email = document.getElementById('reset-email').value;
+            const feedbackDiv = document.getElementById('reset-feedback');
+            toggleLoading(true);
+            try {
+                await sendPasswordResetEmail(auth, email);
+                feedbackDiv.textContent = 'E-mail de redefinição enviado com sucesso! Verifique sua caixa de entrada e spam.';
+                feedbackDiv.className = 'text-center text-sm mt-2 text-green-600';
+            } catch (error) {
+                console.error("Erro ao enviar e-mail de redefinição:", error);
+                feedbackDiv.textContent = 'Não foi possível enviar o e-mail. Verifique se o endereço está correto e tente novamente.';
+                feedbackDiv.className = 'text-center text-sm mt-2 text-red-600';
+            } finally {
+                toggleLoading(false);
+            }
+        });
+        
+        // Links de navegação
+        document.getElementById('login-link').addEventListener('click', (e) => { e.preventDefault(); showPage('auth-page'); });
+        document.getElementById('show-register').addEventListener('click', (e) => { e.preventDefault(); showPage('register-page'); });
+        document.getElementById('show-login').addEventListener('click', (e) => { e.preventDefault(); showPage('auth-page'); });
+        document.getElementById('back-to-menu-from-cart').addEventListener('click', () => showPage('main-page'));
+        document.getElementById('back-to-menu-from-orders').addEventListener('click', () => showPage('main-page'));
+        document.getElementById('back-to-menu-from-admin').addEventListener('click', () => showPage('main-page'));
+        
+        // ===== LÓGICA DE PRODUTOS (FIRESTORE) =====
+        onSnapshot(collection(db, "products"), (snapshot) => {
+            allProducts = snapshot.docs.map(doc => ({ id: doc.id, ...doc.data() }));
+            renderMenu(allProducts);
+            if (document.getElementById('admin-page').classList.contains('active')) {
+                renderAdminProducts(allProducts);
+            }
+        });
+
+        function renderMenu(products) {
+            const menuContainer = document.getElementById('menu-container');
+            menuContainer.innerHTML = '';
+            const categories = { salgadas: [], doces: [], bebidas: [], combos: [] };
+            products.forEach(p => {
+                if (categories[p.category]) categories[p.category].push(p);
+            });
+            const categoryTitles = { salgadas: 'Pizzas Salgadas', doces: 'Pizzas Doces', bebidas: 'Bebidas', combos: 'Combos' };
+            if (products.length === 0) {
+                menuContainer.innerHTML = '<p class="text-center text-gray-500">Nenhum produto no cardápio no momento.</p>';
+                return;
+            }
+            for (const category in categories) {
+                if (categories[category].length > 0) {
+                    const section = document.createElement('section');
+                    section.id = `category-${category}`;
+                    section.className = 'mb-12';
+                    let productCards = '';
+                    categories[category].forEach(p => {
+                        productCards += createProductCard(p);
+                    });
+                    section.innerHTML = `
+                        <h2 class="text-3xl font-bold text-gray-800 mb-6">${categoryTitles[category]}</h2>
+                        <div class="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-8">
+                            ${productCards}
+                        </div>
+                    `;
+                    menuContainer.appendChild(section);
+                }
+            }
+            addEventListenersToMenuButtons();
+            checkStoreStatus();
+        }
+
+        function createProductCard(product) {
+            const sizeOptions = Object.keys(product.sizes).map(size => 
+                `<option value="${product.sizes[size]}">${size} - R$ ${Number(product.sizes[size]).toFixed(2)}</option>`
+            ).join('');
+            return `
+                <div class="bg-white rounded-lg shadow-lg overflow-hidden transform hover:scale-105 transition-transform duration-300 flex flex-col">
+                    <img src="${product.imageUrl}" alt="${product.name}" class="w-full h-48 object-cover" onerror="this.onerror=null;this.src='https://placehold.co/400x300/cccccc/ffffff?text=Imagem+Indisponível';">
+                    <div class="p-4 flex flex-col flex-grow">
+                        <h3 class="text-xl font-bold">${product.name}</h3>
+                        <p class="text-sm text-gray-600 mt-1 flex-grow">${product.description || ''}</p>
+                        <div class="mt-4">
+                            <select id="size-${product.id}" class="w-full p-2 border border-gray-300 rounded-md">
+                                ${sizeOptions}
+                            </select>
+                        </div>
+                        <button data-id="${product.id}" class="add-to-cart-btn mt-4 w-full bg-red-600 text-white py-2 rounded-md hover:bg-red-700 font-semibold">
+                            Adicionar
+                        </button>
+                    </div>
+                </div>
+            `;
+        }
+        
+        function addEventListenersToMenuButtons() {
+            document.querySelectorAll('.add-to-cart-btn').forEach(button => {
+                button.addEventListener('click', (e) => {
+                    if (!currentUser) {
+                        showPage('auth-page');
+                        return;
+                    }
+                    const id = e.target.getAttribute('data-id');
+                    const product = allProducts.find(p => p.id === id);
+                    const sizeSelector = document.getElementById(`size-${id}`);
+                    const selectedSizeName = sizeSelector.options[sizeSelector.selectedIndex].text.split(' - ')[0];
+                    const selectedPrice = parseFloat(sizeSelector.value);
+                    addToCart(product, selectedSizeName, selectedPrice);
+                });
+            });
+        }
+        
+        // ===== LÓGICA DO CARRINHO =====
+        function addToCart(product, size, price) {
+            const cartItem = { id: product.id + '_' + size, name: product.name, size: size, price: price, quantity: 1 };
+            const existingItem = cart.find(item => item.id === cartItem.id);
+            if (existingItem) existingItem.quantity++;
+            else cart.push(cartItem);
+            updateCartUI();
+        }
+        
+        function updateCartUI() {
+            const cartCount = document.getElementById('cart-count');
+            const cartItemsList = document.getElementById('cart-items-list');
+            const cartTotal = document.getElementById('cart-total');
+            cartCount.textContent = cart.reduce((sum, item) => sum + item.quantity, 0);
+            if (cartItemsList) {
+                cartItemsList.innerHTML = '';
+                if (cart.length === 0) {
+                    cartItemsList.innerHTML = '<p class="text-gray-500">Seu carrinho está vazio.</p>';
+                } else {
+                    cart.forEach(item => {
+                        cartItemsList.innerHTML += `
+                            <div class="flex justify-between items-center py-2 border-b">
+                                <div>
+                                    <p class="font-bold">${item.name} (${item.size})</p>
+                                    <p class="text-sm text-gray-600">Qtd: ${item.quantity}</p>
+                                </div>
+                                <div class="flex items-center">
+                                    <span class="font-semibold mr-4">R$ ${(item.price * item.quantity).toFixed(2)}</span>
+                                    <button data-id="${item.id}" class="remove-from-cart-btn text-red-500 hover:text-red-700">Remover</button>
+                                </div>
+                            </div>
+                        `;
+                    });
+                }
+                document.querySelectorAll('.remove-from-cart-btn').forEach(btn => {
+                    btn.addEventListener('click', (e) => {
+                        cart = cart.filter(item => item.id !== e.target.dataset.id);
+                        updateCartUI();
+                    });
+                });
+            }
+            const total = cart.reduce((sum, item) => sum + (item.price * item.quantity), 0);
+            if(cartTotal) cartTotal.textContent = `R$ ${total.toFixed(2)}`;
+        }
+        
+        document.getElementById('cart-button').addEventListener('click', () => {
+            if (!currentUser) { showPage('auth-page'); return; }
+            updateCartUI();
+            showPage('cart-page');
+        });
+
+        document.getElementById('payment-method').addEventListener('change', (e) => {
+            document.getElementById('change-for-money').classList.toggle('hidden', e.target.value !== 'Dinheiro');
+        });
+
+        // ===== LÓGICA DE PEDIDOS =====
+        document.getElementById('place-order-button').addEventListener('click', async () => {
+            if (cart.length === 0) { alert("Seu carrinho está vazio!"); return; }
+            
+            const requiredFields = [
+                { id: 'recipient-name', name: 'Nome de quem vai receber' },
+                { id: 'contact-number', name: 'Número de Contato' },
+                { id: 'delivery-address', name: 'Endereço para entrega' },
+                { id: 'delivery-neighborhood', name: 'Bairro' },
+                { id: 'delivery-cep', name: 'CEP' }
+            ];
+
+            for (const field of requiredFields) {
+                const element = document.getElementById(field.id);
+                if (!element.value) {
+                    alert(`Por favor, preencha o campo obrigatório: ${field.name}.`);
+                    element.focus();
+                    return;
+                }
+            }
+
+            toggleLoading(true);
+
+            const now = new Date();
+            const startTime = new Date(now.getTime() + 50 * 60000); // 50 minutes in ms
+            const endTime = new Date(now.getTime() + 70 * 60000); // 70 minutes in ms
+
+            const formatTime = (date) => {
+                const hours = date.getHours().toString().padStart(2, '0');
+                const minutes = date.getMinutes().toString().padStart(2, '0');
+                return `${hours}:${minutes}`;
+            };
+
+            const defaultPrediction = `${formatTime(startTime)} - ${formatTime(endTime)}`;
+
+            const order = {
+                userId: currentUser.uid,
+                userEmail: currentUser.email,
+                items: cart,
+                total: cart.reduce((sum, item) => sum + (item.price * item.quantity), 0),
+                status: 'Recebido',
+                recipientName: document.getElementById('recipient-name').value,
+                contactNumber: document.getElementById('contact-number').value,
+                address: document.getElementById('delivery-address').value,
+                neighborhood: document.getElementById('delivery-neighborhood').value,
+                cep: document.getElementById('delivery-cep').value,
+                reference: document.getElementById('delivery-reference').value,
+                observation: document.getElementById('order-observation').value,
+                paymentMethod: document.getElementById('payment-method').value,
+                changeNeeded: document.getElementById('payment-method').value === 'Dinheiro' ? document.getElementById('money-change').value : '',
+                deliveryPrediction: defaultPrediction,
+                createdAt: serverTimestamp()
+            };
+            try {
+                await addDoc(collection(db, "orders"), order);
+                cart = [];
+                updateCartUI();
+                loadUserOrders();
+                showPage('orders-page');
+            } catch (error) {
+                console.error("Erro ao finalizar pedido: ", error);
+                alert("Ocorreu um erro ao finalizar seu pedido.");
+            } finally {
+                toggleLoading(false);
+            }
+        });
+
+        function loadUserOrders() {
+            if (!currentUser) return;
+            const q = query(collection(db, "orders"), where("userId", "==", currentUser.uid));
+            onSnapshot(q, (querySnapshot) => {
+                const ordersList = document.getElementById('user-orders-list');
+                ordersList.innerHTML = '';
+                if (querySnapshot.empty) {
+                    ordersList.innerHTML = '<p class="text-gray-500">Você ainda não fez nenhum pedido.</p>';
+                    return;
+                }
+                querySnapshot.docs.sort((a, b) => b.data().createdAt - a.data().createdAt).forEach((doc) => {
+                    ordersList.innerHTML += createOrderCard(doc.data(), doc.id, false);
+                });
+            });
+        }
+        
+        document.getElementById('my-orders-link').addEventListener('click', (e) => {
+            e.preventDefault();
+            if (!currentUser) { showPage('auth-page'); return; }
+            loadUserOrders();
+            showPage('orders-page');
+        });
+
+        // ===== LÓGICA DO ADMIN =====
+        document.getElementById('admin-panel-link').addEventListener('click', (e) => {
+            e.preventDefault();
+            if (!currentUser || currentUser.email !== adminEmail) { showPage('main-page'); return; }
+            loadAdminOrders();
+            showPage('admin-page');
+        });
+
+        function setupAdminTabs() {
+            const tabs = [
+                { btn: document.getElementById('tab-orders'), content: document.getElementById('admin-orders-content') },
+                { btn: document.getElementById('tab-products'), content: document.getElementById('admin-products-content') },
+                { btn: document.getElementById('tab-hours'), content: document.getElementById('admin-hours-content') },
+            ];
+            tabs.forEach(tab => {
+                tab.btn.addEventListener('click', () => {
+                    tabs.forEach(t => {
+                        t.btn.classList.remove('border-red-500', 'text-red-600');
+                        t.btn.classList.add('border-transparent', 'text-gray-500');
+                        t.content.classList.add('hidden');
+                    });
+                    tab.btn.classList.add('border-red-500', 'text-red-600');
+                    tab.btn.classList.remove('border-transparent', 'text-gray-500');
+                    tab.content.classList.remove('hidden');
+
+                    if (tab.btn.id === 'tab-products') {
+                        renderAdminProducts(allProducts);
+                    }
+                    if (tab.btn.id === 'tab-hours') {
+                        loadOpeningHours();
+                    }
+                });
+            });
+        }
+
+        function loadAdminOrders() {
+            const q = query(collection(db, "orders"));
+            onSnapshot(q, (querySnapshot) => {
+                const adminOrdersList = document.getElementById('admin-orders-list');
+                adminOrdersList.innerHTML = '';
+                if (querySnapshot.empty) {
+                    adminOrdersList.innerHTML = '<p class="text-gray-500">Nenhum pedido recebido ainda.</p>';
+                    return;
+                }
+                querySnapshot.docs.sort((a, b) => b.data().createdAt - a.data().createdAt).forEach((doc) => {
+                    adminOrdersList.innerHTML += createOrderCard(doc.data(), doc.id, true);
+                });
+                document.querySelectorAll('.admin-status-btn').forEach(btn => {
+                    btn.addEventListener('click', async (e) => {
+                        toggleLoading(true);
+                        try {
+                            await updateDoc(doc(db, "orders", e.target.dataset.orderId), { status: e.target.dataset.status });
+                        } catch (error) {
+                            console.error("Erro ao atualizar status do pedido:", error);
+                            alert("Ocorreu um erro ao atualizar o status. Verifique as regras do Firebase e o console para mais detalhes.");
+                        } finally {
+                            toggleLoading(false);
+                        }
+                    });
+                });
+                document.querySelectorAll('.save-prediction-btn').forEach(btn => {
+                    btn.addEventListener('click', async (e) => {
+                        const orderId = e.target.dataset.orderId;
+                        const newPrediction = document.getElementById(`prediction-${orderId}`).value;
+                        if (!newPrediction) {
+                            alert("Por favor, insira uma previsão de entrega.");
+                            return;
+                        }
+                        toggleLoading(true);
+                        try {
+                            await updateDoc(doc(db, "orders", orderId), { deliveryPrediction: newPrediction });
+                        } catch (error) {
+                            console.error("Erro ao salvar previsão:", error);
+                            alert("Ocorreu um erro ao salvar a previsão.");
+                        } finally {
+                            toggleLoading(false);
+                        }
+                    });
+                });
+            });
+        }
+
+        function getStatusClass(status) {
+            switch(status) {
+                case 'Recebido': return 'bg-blue-100 text-blue-800';
+                case 'Em Preparo': return 'bg-yellow-100 text-yellow-800';
+                case 'Saiu para Entrega': return 'bg-green-100 text-green-800';
+                case 'Entregue': return 'bg-gray-200 text-gray-800';
+                case 'Cancelado': return 'bg-red-100 text-red-800';
+                default: return 'bg-gray-100 text-gray-800';
+            }
+        }
+
+        function createOrderCard(order, orderId, isAdmin) {
+            const itemsHtml = order.items.map(item => `<li>${item.quantity}x ${item.name} (${item.size})</li>`).join('');
+            const date = order.createdAt ? new Date(order.createdAt.seconds * 1000).toLocaleString('pt-BR') : 'Carregando...';
+            
+            const deliveryInfo = `
+                <div class="mt-4 border-t pt-4">
+                    <p class="font-semibold">Recebedor: <span class="font-normal">${order.recipientName}</span></p>
+                    <p class="font-semibold">Contato: <span class="font-normal">${order.contactNumber}</span></p>
+                    <p class="font-semibold mt-2">Endereço: <span class="font-normal">${order.address}, ${order.neighborhood} - CEP: ${order.cep}</span></p>
+                    ${order.reference ? `<p class="font-semibold mt-2">Referência: <span class="font-normal">${order.reference}</span></p>` : ''}
+                    ${order.observation ? `<p class="font-semibold mt-2">Observação: <span class="font-normal">${order.observation}</span></p>` : ''}
+                </div>
+            `;
+
+            const adminControls = `
+                <div class="mt-4 border-t pt-4">
+                    <div class="flex flex-wrap gap-2">
+                        <button data-order-id="${orderId}" data-status="Em Preparo" class="admin-status-btn px-3 py-1 text-sm font-medium rounded-full bg-yellow-500 text-white hover:bg-yellow-600">Em Preparo</button>
+                        <button data-order-id="${orderId}" data-status="Saiu para Entrega" class="admin-status-btn px-3 py-1 text-sm font-medium rounded-full bg-green-500 text-white hover:bg-green-600">Saiu p/ Entrega</button>
+                        <button data-order-id="${orderId}" data-status="Entregue" class="admin-status-btn px-3 py-1 text-sm font-medium rounded-full bg-gray-500 text-white hover:bg-gray-600">Entregue</button>
+                        <button data-order-id="${orderId}" data-status="Cancelado" class="admin-status-btn px-3 py-1 text-sm font-medium rounded-full bg-red-500 text-white hover:bg-red-600">Cancelar</button>
+                    </div>
+                    <div class="mt-4">
+                        <label for="prediction-${orderId}" class="block text-sm font-medium text-gray-700">Editar Previsão de Entrega</label>
+                        <div class="mt-1 flex items-center gap-2">
+                            <input type="text" id="prediction-${orderId}" value="${order.deliveryPrediction || ''}" class="block w-full shadow-sm sm:text-sm border-gray-300 rounded-md" placeholder="Ex: 23:00 - 23:20">
+                            <button data-order-id="${orderId}" class="save-prediction-btn p-2 bg-blue-500 text-white rounded hover:bg-blue-600 text-sm whitespace-nowrap">Salvar</button>
+                        </div>
+                    </div>
+                </div>
+            `;
+            return `
+                <div class="border rounded-lg p-4 shadow-sm bg-gray-50">
+                    <div class="flex justify-between items-start">
+                        <div>
+                            <p class="font-bold text-lg">Pedido #${orderId.substring(0, 6)}</p>
+                            ${isAdmin ? `<p class="text-sm text-gray-600">${order.userEmail}</p>` : ''}
+                            <p class="text-sm text-gray-500">${date}</p>
+                        </div>
+                        <span class="text-sm font-semibold px-3 py-1 rounded-full ${getStatusClass(order.status)}">
+                            ${order.status}
+                        </span>
+                    </div>
+                    <div class="mt-4"><p class="font-semibold">Itens:</p><ul class="list-disc list-inside text-gray-700">${itemsHtml}</ul></div>
+                    <div class="mt-2"><p class="font-semibold">Previsão de Entrega: <span class="font-normal text-red-600 font-bold">${order.deliveryPrediction || 'Aguardando...'}</span></p></div>
+                    <div class="mt-2"><p class="font-semibold">Pagamento: <span class="font-normal">${order.paymentMethod}</span></p>${order.changeNeeded ? `<p class="font-semibold">Troco para: <span class="font-normal">R$ ${order.changeNeeded}</span></p>` : ''}</div>
+                    ${deliveryInfo}
+                    <div class="mt-4 text-right font-bold text-lg">Total: R$ ${order.total.toFixed(2)}</div>
+                    ${isAdmin && order.status !== 'Entregue' && order.status !== 'Cancelado' ? adminControls : ''}
+                </div>
+            `;
+        }
+        
+        function renderAdminProducts(products) {
+            const container = document.getElementById('admin-products-list');
+            container.innerHTML = '';
+            const categories = { salgadas: [], doces: [], bebidas: [], combos: [] };
+            products.forEach(p => categories[p.category].push(p));
+            for (const category in categories) {
+                if (categories[category].length > 0) {
+                    const categoryTitle = category.charAt(0).toUpperCase() + category.slice(1);
+                    let productsHtml = '';
+                    categories[category].forEach(p => {
+                        productsHtml += `
+                            <div class="flex items-center justify-between p-3 bg-gray-100 rounded-lg">
+                                <div><p class="font-bold">${p.name}</p><p class="text-sm text-gray-500">${Object.keys(p.sizes).join(', ')}</p></div>
+                                <div class="flex space-x-2">
+                                    <button data-id="${p.id}" class="edit-product-btn p-2 bg-blue-500 text-white rounded hover:bg-blue-600">Editar</button>
+                                    <button data-id="${p.id}" class="delete-product-btn p-2 bg-red-500 text-white rounded hover:bg-red-600">Excluir</button>
+                                </div>
+                            </div>
+                        `;
+                    });
+                    container.innerHTML += `<h3 class="text-xl font-bold mt-6 mb-2">${categoryTitle}</h3><div class="space-y-2">${productsHtml}</div>`;
+                }
+            }
+            addEventListenersToAdminButtons();
+        }
+        
+        function addEventListenersToAdminButtons() {
+            document.querySelectorAll('.edit-product-btn').forEach(btn => btn.addEventListener('click', () => openProductModal(btn.dataset.id)));
+            document.querySelectorAll('.delete-product-btn').forEach(btn => btn.addEventListener('click', () => deleteProduct(btn.dataset.id)));
+        }
+
+        function openProductModal(productId = null) {
+            productForm.reset();
+            sizesContainer.innerHTML = '';
+            document.getElementById('product-id').value = '';
+            if (productId) {
+                const product = allProducts.find(p => p.id === productId);
+                document.getElementById('modal-title').textContent = 'Editar Produto';
+                document.getElementById('product-id').value = product.id;
+                document.getElementById('product-name').value = product.name;
+                document.getElementById('product-description').value = product.description || '';
+                document.getElementById('product-category').value = product.category;
+                document.getElementById('product-image-url').value = product.imageUrl;
+                for(const sizeName in product.sizes) addSizeInput(sizeName, product.sizes[sizeName]);
+            } else {
+                document.getElementById('modal-title').textContent = 'Adicionar Produto';
+                addSizeInput();
+            }
+            productModal.classList.remove('hidden');
+            productModal.classList.add('modal-active');
+        }
+
+        function closeProductModal() {
+            productModal.classList.add('hidden');
+            productModal.classList.remove('modal-active');
+        }
+
+        function addSizeInput(name = '', price = '') {
+            const div = document.createElement('div');
+            div.className = 'flex items-center space-x-2';
+            div.innerHTML = `
+                <input type="text" value="${name}" placeholder="Nome do Tamanho (Ex: Média)" class="block w-1/2 shadow-sm sm:text-sm border-gray-300 rounded-md">
+                <input type="number" value="${price}" placeholder="Preço" step="0.01" class="block w-1/3 shadow-sm sm:text-sm border-gray-300 rounded-md">
+                <button type="button" class="remove-size-btn text-red-500 hover:text-red-700">Remover</button>
+            `;
+            sizesContainer.appendChild(div);
+            div.querySelector('.remove-size-btn').addEventListener('click', () => div.remove());
+        }
+
+        async function deleteProduct(productId) {
+            if (confirm('Tem certeza que deseja excluir este produto?')) {
+                toggleLoading(true);
+                try {
+                    await deleteDoc(doc(db, "products", productId));
+                } catch (error) {
+                    console.error("Erro ao excluir produto:", error);
+                    alert("Falha ao excluir o produto.");
+                } finally {
+                    toggleLoading(false);
+                }
+            }
+        }
+
+        productForm.addEventListener('submit', async (e) => {
+            e.preventDefault();
+            toggleLoading(true);
+            const imageUrl = document.getElementById('product-image-url').value;
+            if (!imageUrl) { alert('Por favor, adicione uma URL para a imagem do produto.'); toggleLoading(false); return; }
+            const sizes = {};
+            document.querySelectorAll('#sizes-container > div').forEach(div => {
+                const name = div.children[0].value;
+                const price = parseFloat(div.children[1].value);
+                if (name && !isNaN(price)) sizes[name] = price;
+            });
+            const productData = {
+                name: document.getElementById('product-name').value,
+                description: document.getElementById('product-description').value,
+                category: document.getElementById('product-category').value,
+                imageUrl: imageUrl,
+                sizes: sizes
+            };
+            const productId = document.getElementById('product-id').value;
+            try {
+                if (productId) await updateDoc(doc(db, "products", productId), productData);
+                else await addDoc(collection(db, "products"), productData);
+                closeProductModal();
+            } catch (error) {
+                console.error("Erro ao salvar produto:", error);
+                alert("Falha ao salvar o produto.");
+            } finally {
+                toggleLoading(false);
+            }
+        });
+        
+        document.getElementById('add-product-btn').addEventListener('click', () => openProductModal());
+        document.getElementById('cancel-product-form').addEventListener('click', closeProductModal);
+        document.getElementById('add-size-btn').addEventListener('click', () => addSizeInput());
+        
+        // ===== LÓGICA DE HORÁRIO DE FUNCIONAMENTO =====
+        function renderHoursForm() {
+            const container = document.getElementById('hours-form');
+            container.innerHTML = '';
+            const dayNames = { domingo: "Domingo", segunda: "Segunda-feira", terca: "Terça-feira", quarta: "Quarta-feira", quinta: "Quinta-feira", sexta: "Sexta-feira", sabado: "Sábado" };
+            daysOfWeek.forEach(day => {
+                container.innerHTML += `
+                    <div class="grid grid-cols-3 items-center gap-4">
+                        <label class="font-medium text-gray-700">${dayNames[day]}</label>
+                        <input type="time" id="${day}-open" class="block w-full shadow-sm sm:text-sm border-gray-300 rounded-md">
+                        <input type="time" id="${day}-close" class="block w-full shadow-sm sm:text-sm border-gray-300 rounded-md">
+                    </div>
+                `;
+            });
+        }
+
+        async function saveOpeningHours() {
+            toggleLoading(true);
+            const hoursToSave = {};
+            daysOfWeek.forEach(day => {
+                const open = document.getElementById(`${day}-open`).value;
+                const close = document.getElementById(`${day}-close`).value;
+                hoursToSave[day] = { open: open || null, close: close || null };
+            });
+            try {
+                await setDoc(doc(db, "config", "openingHours"), hoursToSave);
+                document.getElementById('hours-feedback').textContent = "Horários salvos com sucesso!";
+            } catch (error) {
+                console.error("Erro ao salvar horários:", error);
+                document.getElementById('hours-feedback').textContent = "Erro ao salvar. Tente novamente.";
+            } finally {
+                toggleLoading(false);
+            }
+        }
+
+        async function loadOpeningHours() {
+            const docRef = doc(db, "config", "openingHours");
+            const docSnap = await getDoc(docRef);
+            if (docSnap.exists()) {
+                openingHours = docSnap.data();
+                daysOfWeek.forEach(day => {
+                    document.getElementById(`${day}-open`).value = openingHours[day]?.open || '';
+                    document.getElementById(`${day}-close`).value = openingHours[day]?.close || '';
+                });
+            }
+        }
+        
+        async function checkStoreStatus() {
+            const docRef = doc(db, "config", "openingHours");
+            const docSnap = await getDoc(docRef);
+            if (!docSnap.exists()) return; // Se não há horários definidos, a loja está sempre aberta
+            
+            openingHours = docSnap.data();
+            const now = new Date();
+            const currentDayIndex = now.getDay();
+            const currentDayName = daysOfWeek[currentDayIndex];
+            const currentTime = now.getHours().toString().padStart(2, '0') + ":" + now.getMinutes().toString().padStart(2, '0');
+            
+            const todayHours = openingHours[currentDayName];
+            let isOpen = false;
+
+            if (todayHours && todayHours.open && todayHours.close) {
+                if (todayHours.open < todayHours.close) { // Abre e fecha no mesmo dia
+                    if (currentTime >= todayHours.open && currentTime < todayHours.close) {
+                        isOpen = true;
+                    }
+                } else { // Abre num dia e fecha no outro (ex: 18:00 - 01:00)
+                    if (currentTime >= todayHours.open || currentTime < todayHours.close) {
+                        isOpen = true;
+                    }
+                }
+            }
+            
+            updateStoreStatusUI(isOpen);
+        }
+
+        function updateStoreStatusUI(isOpen) {
+            const banner = document.getElementById('store-status-banner');
+            const buttons = document.querySelectorAll('.add-to-cart-btn');
+            
+            if (isOpen) {
+                banner.classList.add('hidden');
+                buttons.forEach(btn => {
+                    btn.disabled = false;
+                    btn.textContent = "Adicionar";
+                    btn.classList.remove('bg-gray-400', 'cursor-not-allowed');
+                    btn.classList.add('bg-red-600', 'hover:bg-red-700');
+                });
+            } else {
+                banner.classList.remove('hidden');
+                // Lógica para encontrar o próximo horário de funcionamento
+                const dayNames = { domingo: "Domingo", segunda: "Segunda", terca: "Terça", quarta: "Quarta", quinta: "Quinta", sexta: "Sexta", sabado: "Sábado" };
+                let nextOpeningMsg = "Consulte nossos horários.";
+                let found = false;
+                for (let i = 0; i < 7 && !found; i++) {
+                    const dayIndex = (new Date().getDay() + i) % 7;
+                    const dayName = daysOfWeek[dayIndex];
+                    if (openingHours[dayName] && openingHours[dayName].open) {
+                        nextOpeningMsg = `Abrimos ${i === 0 ? 'hoje' : dayNames[dayName]} às ${openingHours[dayName].open}.`;
+                        found = true;
+                    }
+                }
+                document.getElementById('next-opening-time').textContent = nextOpeningMsg;
+                
+                buttons.forEach(btn => {
+                    btn.disabled = true;
+                    btn.textContent = "Fechado";
+                    btn.classList.add('bg-gray-400', 'cursor-not-allowed');
+                    btn.classList.remove('bg-red-600', 'hover:bg-red-700');
+                });
+            }
+        }
+
+        // ===== INICIALIZAÇÃO =====
+        document.addEventListener('DOMContentLoaded', () => {
+            setupAdminTabs();
+            renderHoursForm();
+            checkStoreStatus();
+            document.getElementById('save-hours-btn').addEventListener('click', saveOpeningHours);
+        });
+
+    </script>
+</body>
+</html>
+
+
+
