@@ -5,8 +5,6 @@
 
 ## 📖 Apresentação do Projeto
 
-Fala, galera! 👋
-
 Este é um **projeto pessoal** que desenvolvi com o objetivo principal de consolidar e colocar em prática meus conhecimentos em **HTML, CSS, JavaScript (Vanilla) e Google Firebase**.
 
 A ideia central foi construir uma **plataforma genérica de pizzaria/restaurante** que fosse totalmente funcional, mas sem depender de frameworks pesados no frontend (como React ou Angular). Construí tudo como uma *Single Page Application (SPA)* nativa, manipulando o DOM diretamente com JS e usando o [Tailwind CSS](https://tailwindcss.com/) via CDN para uma estilização rápida e responsiva.
