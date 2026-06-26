@@ -1,6 +1,6 @@
 # 🍕 Pizzaria LeVitlon - Plataforma de Delivery Genérica
 
-![Banner do Projeto](adicione-aqui-o-link-da-imagem-de-capa.png)
+![Banner do Projeto](capa.png)
 *Um sistema completo de delivery, do cliente ao painel do dono.*
 
 ## 📖 Apresentação do Projeto
