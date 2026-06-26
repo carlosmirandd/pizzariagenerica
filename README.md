@@ -17,12 +17,10 @@ O grande diferencial deste projeto é que ele não é apenas uma "vitrine". Ele 
 
 ## 📸 Telas do Sistema
 
-> 💡 **Nota:** *[Substitua os links abaixo pelas imagens (prints) do seu projeto rodando]*
-
 <div align="center">
-  <img src="link-do-print-do-cardapio.png" width="400px" alt="Cardápio Dinâmico">
-  <img src="link-do-print-do-carrinho.png" width="400px" alt="Carrinho e Checkout">
-  <img src="link-do-print-do-painel-admin.png" width="400px" alt="Painel do Administrador">
+  <img src="cardapio.png" width="400px" alt="Cardápio Dinâmico">
+  <img src="carrinho.png" width="400px" alt="Carrinho e Checkout">
+  <img src="admin.png" width="400px" alt="Painel do Administrador">
 </div>
 
 ---
