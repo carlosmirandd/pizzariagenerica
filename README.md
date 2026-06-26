@@ -62,7 +62,7 @@ Como o projeto foi feito com tecnologias web nativas, rodar localmente é muito 
 
 1. **Clone o repositório:**
 
-       git clone [https://github.com/carlosmirandd/pizzariagenerica.git](https://github.com/carlosmirandd/pizzariagenerica.git)
+       git clone https://github.com/carlosmirandd/pizzariagenerica.git
 
 2. **Configure o Firebase:**
    * Crie um projeto no [Firebase Console](https://console.firebase.google.com/).
