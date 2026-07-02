@@ -69,6 +69,7 @@ Como o projeto foi feito com tecnologias web nativas, rodar localmente é muito 
    * Habilite o **Authentication** (E-mail e Senha).
    * Habilite o **Firestore Database** (configure as regras para permitir leitura/escrita).
    * Adicione as **Regras** a seguir no Firestore:
+  
    ```cel
    rules_version = '2';
    service cloud.firestore {
@@ -100,6 +101,7 @@ Como o projeto foi feito com tecnologias web nativas, rodar localmente é muito 
     }
    }
    ```
+   
    * No arquivo `index.html`, vá até a seção do Firebase e substitua o objeto `firebaseConfig` pelas chaves da sua aplicação.
 
 3. **Inicie o servidor:**
