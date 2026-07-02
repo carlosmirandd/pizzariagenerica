@@ -68,6 +68,38 @@ Como o projeto foi feito com tecnologias web nativas, rodar localmente é muito 
    * Crie um projeto no [Firebase Console](https://console.firebase.google.com/).
    * Habilite o **Authentication** (E-mail e Senha).
    * Habilite o **Firestore Database** (configure as regras para permitir leitura/escrita).
+   * Adicione as **Regras** a seguir no Firestore:
+   ```cel
+   rules_version = '2';
+   service cloud.firestore {
+    match /databases/{database}/documents {
+  
+    // Regra para a coleção de 'products'
+    // Permite que qualquer pessoa leia os produtos.
+    // Apenas usuários autenticados (o seu admin) podem criar, editar ou apagar produtos.
+    match /products/{productId} {
+      allow read: if true;
+      allow write: if request.auth != null;
+    }
+    
+    // Regra para a coleção de 'config'
+    // Permite que qualquer pessoa leia as configurações de aparência (URL do fundo).
+    // Apenas usuários autenticados (o seu admin) podem alterar as configurações.
+    match /config/{docId} {
+      allow read: if true;
+      allow write: if request.auth != null;
+    }
+
+    // Regra para a coleção de 'orders'
+    // Permite que qualquer usuário autenticado crie um pedido.
+    // Apenas o dono do pedido OU o administrador podem ler ou atualizar o pedido.
+    match /orders/{orderId} {
+      allow create: if request.auth != null;
+      allow read, update: if request.auth.uid == resource.data.userId || request.auth.token.email == "admin@levitlon.com";
+     }
+    }
+   }
+   ```
    * No arquivo `index.html`, vá até a seção do Firebase e substitua o objeto `firebaseConfig` pelas chaves da sua aplicação.
 
 3. **Inicie o servidor:**
